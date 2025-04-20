@@ -6,6 +6,7 @@ from datetime import datetime
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from torch.utils.tensorboard import SummaryWriter
+from lightning.pytorch.loggers import TensorBoardLogger
 
 from environment.tetris_env import TetrisEnv
 from agents.population import Population
@@ -77,9 +78,11 @@ def main():
     device = get_device()
     print_device_info()
     
-    # Setup tensorboard
-    log_dir = os.path.join(args.log_dir, datetime.now().strftime("%Y%m%d-%H%M%S"))
-    writer = SummaryWriter(log_dir=log_dir)
+    # Setup Lightning TensorBoard logger
+    logger = TensorBoardLogger(save_dir=args.log_dir, name="conv_pyboy", version=datetime.now().strftime("%Y%m%d-%H%M%S"))
+    writer = logger.experiment
+    # Log hyperparameters to TensorBoard
+    logger.log_hyperparams(vars(args))
     
     # Create environment
     env = TetrisEnv(rom_path=args.rom_path, headless=args.headless)
@@ -205,7 +208,7 @@ def main():
     print("\nTraining completed!")
     print(f"Best score achieved: {population.best_score_ever:.2f}")
     print(f"Checkpoints saved to {args.save_dir}")
-    print(f"Logs saved to {log_dir}")
+    print(f"Logs saved to {logger.log_dir}")
 
 
 if __name__ == "__main__":
