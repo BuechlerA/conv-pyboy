@@ -212,4 +212,6 @@ def main():
 
 
 if __name__ == "__main__":
+    import multiprocessing as mp  # Ensure spawn method for CUDA in subprocesses
+    mp.set_start_method('spawn', force=True)
     main()

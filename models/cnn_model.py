@@ -2,6 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from utils.device_utils import get_device
+import logging
+
+# Configure logger for this module
+logger = logging.getLogger(__name__)
 
 
 class TetrisCNN(nn.Module):
@@ -29,7 +33,7 @@ class TetrisCNN(nn.Module):
         self.device = get_device()
         
         # Print input dimensions for debugging
-        print(f"CNN Init - Input dims: channels={input_channels}, height={input_height}, width={input_width}")
+        logger.info(f"CNN Init - Input dims: channels={input_channels}, height={input_height}, width={input_width}")
         
         # First convolutional layer - use smaller kernel for better feature extraction
         self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=5, stride=2, padding=2)
@@ -52,7 +56,7 @@ class TetrisCNN(nn.Module):
         # First conv: kernel=5, stride=2, padding=2
         h = conv_output_size(h, 5, 2, 2)
         w = conv_output_size(w, 5, 2, 2)
-        print(f"After conv1: h={h}, w={w}")
+        logger.debug(f"After conv1: h={h}, w={w}")
         
         if h <= 0 or w <= 0:
             raise ValueError(f"Invalid dimensions after conv1: height={h}, width={w}")
@@ -60,7 +64,7 @@ class TetrisCNN(nn.Module):
         # Second conv: kernel=4, stride=2, padding=0
         h = conv_output_size(h, 4, 2)
         w = conv_output_size(w, 4, 2)
-        print(f"After conv2: h={h}, w={w}")
+        logger.debug(f"After conv2: h={h}, w={w}")
         
         if h <= 0 or w <= 0:
             raise ValueError(f"Invalid dimensions after conv2: height={h}, width={w}")
@@ -68,13 +72,13 @@ class TetrisCNN(nn.Module):
         # Third conv: kernel=3, stride=1, padding=0
         h = conv_output_size(h, 3, 1)
         w = conv_output_size(w, 3, 1)
-        print(f"After conv3: h={h}, w={w}")
+        logger.debug(f"After conv3: h={h}, w={w}")
         
         if h <= 0 or w <= 0:
             raise ValueError(f"Invalid dimensions after conv3: height={h}, width={w}")
             
         linear_input_size = h * w * 64
-        print(f"Flattened size for fully connected layer: {linear_input_size} (h={h}, w={w})")
+        logger.debug(f"Flattened size for fully connected layer: {linear_input_size} (h={h}, w={w})")
         
         # Fully connected layers
         self.fc1 = nn.Linear(linear_input_size, 512)
@@ -185,7 +189,7 @@ class DuelingTetrisCNN(TetrisCNN):
         w = conv_output_size(w, 3, 1)
         
         linear_input_size = h * w * 64
-        print(f"Dueling CNN flattened size: {linear_input_size}")
+        logger.debug(f"Dueling CNN flattened size: {linear_input_size}")
         
         # Replace the final layers with dueling architecture
         self.fc1 = nn.Linear(linear_input_size, 512)
