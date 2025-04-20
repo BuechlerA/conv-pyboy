@@ -1,4 +1,9 @@
 import torch
+import logging
+import os
+
+# Logger for device utilities
+logger = logging.getLogger(__name__)
 
 def get_device():
     """
@@ -9,13 +14,13 @@ def get_device():
     """
     if torch.backends.mps.is_available():
         device = torch.device("mps")
-        print("Using MPS device (Apple Silicon)")
+        # silent: device selection logged once in print_device_info
     elif torch.cuda.is_available():
         device = torch.device("cuda")
-        print("Using CUDA device (NVIDIA GPU)")
+        # silent: will be logged in print_device_info with PID
     else:
         device = torch.device("cpu")
-        print("Using CPU device")
+        # silent: will be logged in print_device_info with PID
     
     return device
 
@@ -24,10 +29,11 @@ def print_device_info():
     Print information about the PyTorch device being used
     """
     device = get_device()
+    pid = os.getpid()
     
     if device.type == "mps":
-        print(f"Using Apple Silicon (MPS) for computation")
+        logger.info(f"[PID {pid}] Apple Silicon (MPS) for computation")
     elif device.type == "cuda":
-        print(f"Using CUDA device: {torch.cuda.get_device_name(0)}")
+        logger.info(f"[PID {pid}] CUDA device: {torch.cuda.get_device_name(0)}")
     else:
-        print("Using CPU for computation")
+        logger.info(f"[PID {pid}] CPU for computation")
