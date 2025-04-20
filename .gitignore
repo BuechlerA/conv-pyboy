@@ -1,0 +1,55 @@
+# PyBoy Tetris CNN Project .gitignore
+
+# Game ROMs and save states
+*.gb
+*.gb.ram
+*.gb.state
+
+# Trained models
+data/agents/*.pt
+
+# TensorBoard logs
+data/logs/
+
+# Game recordings
+data/recordings/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Misc
+.coverage
+htmlcov/
+.pytest_cache/
