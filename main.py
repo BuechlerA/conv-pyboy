@@ -208,15 +208,29 @@ def main():
                     # Process input data: create proper tensor shape, move to CPU
                     if len(initial_state.shape) == 3:  # (H, W, C)
                         # Convert to (C, H, W) format expected by PyTorch
-                        channels = initial_state.shape[2]
-                        height = initial_state.shape[0]
-                        width = initial_state.shape[1]
+                        # Fix: Ensure correct permutation from (H, W, C) to (C, H, W)
                         input_tensor = torch.FloatTensor(initial_state).permute(2, 0, 1)
+                        
+                        # Log the tensor shape for debugging
+                        logging.debug(f"Input tensor shape after permutation: {input_tensor.shape}")
+                        
+                        # Double check shape matches expected model input
+                        channels, height, width = input_tensor.shape
+                        logging.debug(f"Expected model input: channels={state_shape[0]}, height={state_shape[1]}, width={state_shape[2]}")
+                        
+                        # Explicitly verify dimensions match what's expected by the model
+                        if channels != state_shape[0] or height != state_shape[1] or width != state_shape[2]:
+                            logging.warning(f"Tensor shape mismatch: got ({channels}, {height}, {width}), expected {state_shape}")
+                            # Force the correct shape if needed
+                            input_tensor = input_tensor.reshape(state_shape[0], state_shape[1], state_shape[2])
                     else:
                         input_tensor = torch.FloatTensor(initial_state)
                     
                     # Add batch dimension and ensure on CPU
                     input_tensor = input_tensor.unsqueeze(0).to("cpu")
+                    
+                    # Log the final input shape before passing to the model
+                    logging.debug(f"Final input tensor shape with batch dimension: {input_tensor.shape}")
                     
                     # Log graph to TensorBoard, with error handling
                     try:
